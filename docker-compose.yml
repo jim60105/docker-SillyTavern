@@ -30,28 +30,5 @@ services:
     command: ["default-user", $DEFAULT_USER_PASSWORD]
     restart: "no"
 
-  sillytavern-extras:
-    container_name: sillytavern-extras
-    image: cohee1207/sillytavern-extras
-    build:
-      context: ./SillyTavern-Extras
-      dockerfile: docker/Dockerfile
-      args:
-        REQUIREMENTS: requirements.txt
-    ports:
-      - "5100:5100"
-    volumes:
-      - ./api_key.txt:/sillytavern-extras/api_key.txt
-    entrypoint:
-      [
-        "python",
-        "server.py",
-        "--enable-modules=classify,edge-tts,prompt",
-        "--listen",
-        "--sd-remote",
-        "--sd-remote-host=${SD_REMOTE_HOST}",
-      ]
-    restart: unless-stopped
-
 volumes:
   data:

@@ -1,6 +1,3 @@
 [submodule "SillyTavern"]
 	path = SillyTavern
 	url = https://github.com/SillyTavern/SillyTavern.git
-[submodule "SillyTavern-Extras"]
-	path = SillyTavern-Extras
-	url = https://github.com/SillyTavern/SillyTavern-Extras.git
