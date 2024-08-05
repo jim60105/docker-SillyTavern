@@ -3,6 +3,9 @@
         "Buildx",
         "distroless",
         "Dockerfiles",
-        "gplv"
+        "gplv",
+        "nocopy",
+        "sillytavern",
+        "tmpfs"
     ]
 }

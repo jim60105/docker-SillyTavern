@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-ARG UID=101
+ARG UID=1001
 ARG VERSION=EDGE
 ARG RELEASE=0
 
@@ -27,7 +27,7 @@ RUN install -d -m 775 -o $UID -g 0 /licenses && \
     install -d -m 775 -o $UID -g 0 /app && \
     install -d -m 775 -o $UID -g 0 /app/data
 
-# Dependencies
+# Runtime dependencies
 RUN --mount=type=cache,id=apk-$TARGETARCH$TARGETVARIANT,sharing=locked,target=/var/cache/apk \
     apk update && apk add -u \
     dumb-init=1.2.5-r3 \
@@ -37,6 +37,7 @@ RUN --mount=type=cache,id=apk-$TARGETARCH$TARGETVARIANT,sharing=locked,target=/v
 # Copy licenses (OpenShift Policy)
 COPY --link --chown=$UID:0 --chmod=775 LICENSE /licenses/LICENSE
 
+# Copy dist
 COPY --from=build --chown=$UID:0 --chmod=775 /app /app
 
 # Copy default config
@@ -56,9 +57,6 @@ RUN \
     touch /app/public/css/user.css
 
 WORKDIR /app
-
-# # Set the default user with the password "SHOULD_CHANGE_THIS_PASSWORD"
-# RUN node /app/recover.js default-user SHOULD_CHANGE_THIS_PASSWORD
 
 EXPOSE 8000
 

@@ -1,32 +1,57 @@
 services:
   sillytavern:
     container_name: sillytavern
-    image: ghcr.io/sillytavern/sillytavern:latest
+    image: ghcr.io/jim60105/sillytavern:latest
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./SillyTavern
+      dockerfile: ../SillyTavern.Dockerfile
       args:
-        - UID=101
+        - UID=1001
       cache_from:
-        - ghcr.io/sillytavern/sillytavern:cache
+        - ghcr.io/jim60105/sillytavern:cache
       cache_to:
         - type=inline
-    hostname: sillytavern
-    user: "101:0"
+    user: "1001:0"
     ports:
       - "8000:8000"
     volumes:
-      - "./data:/app/data"
+      - data:/app/data
     restart: unless-stopped
 
-  # Reset the password for the default user
-  recover:
+  # Use this to reset the password for the default user
+  sillytavern_recover:
     extends:
       file: docker-compose.yml
       service: sillytavern
     container_name: sillytavern_recover
-    hostname: sillytavern_recover
     profiles:
       - recover
-    command: ["recover.js", "default-user", "SHOULD_CHANGE_THIS_PASSWORD"]
+    entrypoint: ["dumb-init", "--", "node", "recover.js"]
+    command: ["default-user", $DEFAULT_USER_PASSWORD]
     restart: "no"
+
+  sillytavern-extras:
+    container_name: sillytavern-extras
+    image: cohee1207/sillytavern-extras
+    build:
+      context: ./SillyTavern-Extras
+      dockerfile: docker/Dockerfile
+      args:
+        REQUIREMENTS: requirements.txt
+    ports:
+      - "5100:5100"
+    volumes:
+      - ./api_key.txt:/sillytavern-extras/api_key.txt
+    entrypoint:
+      [
+        "python",
+        "server.py",
+        "--enable-modules=caption,classify,edge-tts,prompt",
+        "--listen",
+        "--sd-remote",
+        "--sd-remote-host=${SD_REMOTE_HOST}",
+      ]
+    restart: unless-stopped
+
+volumes:
+  data:
