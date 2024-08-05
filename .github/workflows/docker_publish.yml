@@ -43,7 +43,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          images: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }},quay.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
           tags: |
             ${{ github.ref_name }}
             latest
@@ -61,6 +61,13 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
+
+      - name: Login to Quay Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v5
