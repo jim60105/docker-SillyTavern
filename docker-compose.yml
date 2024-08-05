@@ -27,7 +27,7 @@ services:
     profiles:
       - recover
     entrypoint: ["dumb-init", "--", "node", "recover.js"]
-    command: ["default-user", $DEFAULT_USER_PASSWORD]
+    command: ["default-user", "SHOULD_CHANGE_THIS_PASSWORD"]
     restart: "no"
 
 volumes:
