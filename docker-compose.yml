@@ -1,20 +1,32 @@
 services:
-  infinite-image-browsing:
-    container_name: infinite-image-browsing
-    image: ghcr.io/jim60105/infinite-image-browsing:latest
+  sillytavern:
+    container_name: sillytavern
+    image: ghcr.io/sillytavern/sillytavern:latest
     build:
       context: .
-      dockerfile: nuitka.Dockerfile
+      dockerfile: Dockerfile
       args:
-        - UID=1001
+        - UID=101
       cache_from:
-        - ghcr.io/jim60105/infinite-image-browsing:cache
+        - ghcr.io/sillytavern/sillytavern:cache
       cache_to:
         - type=inline
-    user: "1001:0"
+    hostname: sillytavern
+    user: "101:0"
     ports:
-      - 80:80
-    tmpfs:
-      - /tmp
+      - "8000:8000"
     volumes:
-      - ${OUTPUTS?Please set the outputs directory from the `AUTOMATIC1111/stable-diffusion-webui` in `.env` file.}:/outputs
+      - "./data:/app/data"
+    restart: unless-stopped
+
+  # Reset the password for the default user
+  recover:
+    extends:
+      file: docker-compose.yml
+      service: sillytavern
+    container_name: sillytavern_recover
+    hostname: sillytavern_recover
+    profiles:
+      - recover
+    command: ["recover.js", "default-user", "SHOULD_CHANGE_THIS_PASSWORD"]
+    restart: "no"
