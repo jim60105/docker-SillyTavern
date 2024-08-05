@@ -7,12 +7,12 @@ FROM node:lts-alpine AS build
 
 WORKDIR /app
 
-RUN --mount=source=package.json,target=package.json \
-    --mount=source=package-lock.json,target=package-lock.json \
-    --mount=source=post-install.js,target=post-install.js \
+RUN --mount=source=SillyTavern/package.json,target=package.json \
+    --mount=source=SillyTavern/package-lock.json,target=package-lock.json \
+    --mount=source=SillyTavern/post-install.js,target=post-install.js \
     npm ci && npm cache clean --force
 
-COPY . .
+COPY SillyTavern/. /app/.
 
 FROM node:lts-alpine AS final
 
@@ -35,7 +35,8 @@ RUN --mount=type=cache,id=apk-$TARGETARCH$TARGETVARIANT,sharing=locked,target=/v
     git=2.45.2-r0
 
 # Copy licenses (OpenShift Policy)
-COPY --link --chown=$UID:0 --chmod=775 LICENSE /licenses/LICENSE
+COPY --link --chown=$UID:0 --chmod=775 LICENSE /licenses/Dockerfile.LICENSE
+COPY --link --chown=$UID:0 --chmod=775 SillyTavern/LICENSE /licenses/LICENSE
 
 # Copy dist
 COPY --from=build --chown=$UID:0 --chmod=775 /app /app
@@ -63,8 +64,8 @@ EXPOSE 8000
 VOLUME [ "/app/data" ]
 
 # Use dumb-init as PID 1 to handle signals properly
-ENTRYPOINT [ "dumb-init", "--", "node" ]
-CMD [ "server.js" ]
+ENTRYPOINT [ "dumb-init", "--", "node", "server.js" ]
+# CMD [ ]
 
 ARG VERSION
 ARG RELEASE

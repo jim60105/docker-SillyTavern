@@ -3,8 +3,8 @@ services:
     container_name: sillytavern
     image: ghcr.io/jim60105/sillytavern:latest
     build:
-      context: ./SillyTavern
-      dockerfile: ../SillyTavern.Dockerfile
+      context: .
+      dockerfile: ./Dockerfile
       args:
         - UID=1001
       cache_from:
