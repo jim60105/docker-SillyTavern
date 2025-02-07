@@ -30,9 +30,9 @@ RUN install -d -m 775 -o $UID -g 0 /licenses && \
 # Runtime dependencies
 RUN --mount=type=cache,id=apk-$TARGETARCH$TARGETVARIANT,sharing=locked,target=/var/cache/apk \
     apk update && apk add -u \
-    dumb-init=1.2.5-r3 \
+    dumb-init \
     # Needed for runtime plugin installation
-    git=2.45.2-r0
+    git
 
 # Copy licenses (OpenShift Policy)
 COPY --link --chown=$UID:0 --chmod=775 LICENSE /licenses/Dockerfile.LICENSE
@@ -40,6 +40,9 @@ COPY --link --chown=$UID:0 --chmod=775 SillyTavern/LICENSE /licenses/LICENSE
 
 # Copy dist
 COPY --from=build --chown=$UID:0 --chmod=775 /app /app
+
+# Pre-compile public libraries
+RUN node "/app/docker/build-lib.js"
 
 # Copy default config
 COPY --from=build --chown=$UID:0 --chmod=775 /app/default/config.yaml /app/
