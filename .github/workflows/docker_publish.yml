@@ -85,7 +85,7 @@ jobs:
             VERSION=${{ github.ref_name }}
             RELEASE=${{ github.run_number }}
           platforms: linux/amd64
-          # Cache to regietry instead of gha to avoid the capacity limit.
+          # Cache to registry instead of gha to avoid the capacity limit.
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:cache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:cache,mode=max
           sbom: true
