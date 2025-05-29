@@ -17,6 +17,8 @@ on:
 permissions:
   contents: read
   packages: write
+  id-token: write
+  attestations: write
 
 env:
   PROJECT_NAME: SillyTavern
@@ -70,6 +72,7 @@ jobs:
           password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Build and push
+        id: build_push
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -87,3 +90,15 @@ jobs:
           cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:cache,mode=max
           sbom: true
           provenance: true
+
+      - name: Attest GHCR image
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build_push.outputs.digest }}
+
+      - name: Attest Quay image
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: quay.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build_push.outputs.digest }}
