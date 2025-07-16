@@ -53,6 +53,10 @@ RUN \
     # Workaround for user.css not found
     touch /app/public/css/user.css
 
+ENV GIT_CONFIG_COUNT=1
+ENV GIT_CONFIG_KEY_0="safe.directory"
+ENV GIT_CONFIG_VALUE_0="*"
+
 EXPOSE 8000
 
 VOLUME [ "/app/data" ]
