@@ -3,18 +3,9 @@ ARG UID=1001
 ARG VERSION=EDGE
 ARG RELEASE=0
 
-FROM node:lts-alpine AS build
+FROM node:lts-alpine AS final
 
 WORKDIR /app
-
-RUN --mount=source=SillyTavern/package.json,target=package.json \
-    --mount=source=SillyTavern/package-lock.json,target=package-lock.json \
-    --mount=source=SillyTavern/post-install.js,target=post-install.js \
-    npm ci && npm cache clean --force
-
-COPY SillyTavern/. /app/.
-
-FROM node:lts-alpine AS final
 
 # RUN mount cache for multi-arch: https://github.com/docker/buildx/issues/549#issuecomment-1788297892
 ARG TARGETARCH
@@ -39,13 +30,15 @@ COPY --link --chown=$UID:0 --chmod=775 LICENSE /licenses/Dockerfile.LICENSE
 COPY --link --chown=$UID:0 --chmod=775 SillyTavern/LICENSE /licenses/LICENSE
 
 # Copy dist
-COPY --from=build --chown=$UID:0 --chmod=775 /app /app
+COPY --chown=$UID:0 --chmod=775 SillyTavern /app
 
 # Pre-compile public libraries
-RUN node "/app/docker/build-lib.js"
+RUN npm ci && \
+    npm cache clean --force && \
+    node "/app/docker/build-lib.js"
 
 # Copy default config
-COPY --from=build --chown=$UID:0 --chmod=775 /app/default/config.yaml /app/
+COPY --chown=$UID:0 --chmod=775 SillyTavern/default/config.yaml /app/
 
 RUN \
     # Listen for connections on all interfaces
@@ -59,8 +52,6 @@ RUN \
     sed -i 's/enableUserAccounts: false/enableUserAccounts: true/' /app/config.yaml && \
     # Workaround for user.css not found
     touch /app/public/css/user.css
-
-WORKDIR /app
 
 EXPOSE 8000
 
