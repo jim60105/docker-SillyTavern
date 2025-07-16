@@ -58,7 +58,7 @@ EXPOSE 8000
 VOLUME [ "/app/data" ]
 
 # Use dumb-init as PID 1 to handle signals properly
-ENTRYPOINT [ "dumb-init", "--", "/app/docker-entrypoint.sh" ]
+ENTRYPOINT [ "dumb-init", "--", "/app/docker/docker-entrypoint.sh" ]
 # CMD [ ]
 
 ARG VERSION
