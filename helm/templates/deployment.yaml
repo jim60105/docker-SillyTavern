@@ -11,6 +11,7 @@ spec:
     metadata:
       labels: {{- include "sillytavern.selectorLabels" . | nindent 8 }}
     spec:
+      {{- if .Values.password }}
       initContainers:
         - name: init-sillytavern
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -21,6 +22,7 @@ spec:
             - name: PASSWORD
               value: {{ .Values.password }}
           command: ["dumb-init", "--", "node", "recover.js", "default-user", "$(PASSWORD)"]
+      {{- end }}
 
       containers:
         - name: {{ .Chart.Name }}
